@@ -1,0 +1,56 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+@import "variables_and_mixins.scss";
+
+// Vars
+
+// -----------------------------------------------------------------------------
+//  Variables
+//  - Define global variables for the project
+//--------------------------------------------------------------------------- */
+
+// RESPONSIVE BREAKPOINTS 
+
+$breakpoint-small: 30em;  			// equivalent to 480/16
+$breakpoint-tablet: 48em; 			// equivalent to 768/16
+$breakpoint-desktop: 60em; 			// equivalent to 960/16 
+$breakpoint-wide-desktop: 87.5em; 	// equivalent to 1400/16 
+$breakpoint-wide: 100em; 			// equivalent to 1600/16 
+
+$breakpoint-small-prefix: "sm";
+$breakpoint-tablet-prefix: "md";
+$breakpoint-desktop-prefix: "lg";
+
+
+html, body{
+	margin: 0;
+	padding: 0;
+}
+
+*, *:before, *:after {
+	-moz-box-sizing: border-box; 
+	-webkit-box-sizing: border-box; 
+	box-sizing: border-box;
+}	
+
+
+/* Create default columns */
+
+@include setup-grid;
+
+@include make-columns($grid-columns,"");		
+
+@media screen and (min-width: $breakpoint-small){
+	@include make-columns($grid-columns,$breakpoint-small-prefix);		
+}
+@media screen and (min-width: $breakpoint-tablet){
+	@include make-columns($grid-columns,$breakpoint-tablet-prefix);		
+}
+@media screen and (min-width: $breakpoint-desktop){
+	@include make-columns($grid-columns,$breakpoint-desktop-prefix);		
+}
+
+@include make-golden-columns($grid-columns,"");

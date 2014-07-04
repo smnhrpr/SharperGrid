@@ -1,0 +1,204 @@
+
+// GRID
+$grid-gutter-width: 1.25em;
+$grid-columns: 12;
+$grid-fixed-width: 60;
+$grid-debug: true;
+$grid-debug-colour: #33b4e4;
+
+@mixin setup-grid{
+	.row{
+	
+		overflow: hidden;
+		*zoom: 1;	
+	
+		@if $grid-debug{
+			border-bottom: 1px solid $grid-debug-colour;		
+		}
+		
+		&::after{
+			overflow: hidden;
+			*zoom: 1;	
+		}
+	    
+	}
+	
+	[class^="col-"]{
+		display: block;
+		float: left;
+		min-height: 1px;
+		padding-left:  ($grid-gutter-width / 2);
+		padding-right: ($grid-gutter-width / 2);
+		position: relative;
+		vertical-align: top;
+		width: 100%;
+	}	
+	
+	// Add lines for debugging if $grid-debug is set to true
+
+	@if $grid-debug == true{
+		[class^="col-"]{
+			&::before{
+				content: "";
+				height: 100%;
+				border-right: 1px solid $grid-debug-colour;
+				position: absolute;
+				left: $grid-gutter-width/2;
+				top: 0;
+			}
+			&::after{
+				content: "";
+				height: 100%;
+				border-right: 1px solid $grid-debug-colour;
+				position: absolute;
+				right: $grid-gutter-width/2;
+				top: 0;
+			}
+		}
+	}	
+
+}
+
+
+
+// ----------------------------------------------------
+//	CALCULATE COLUMN WIDTH
+//  - $column-span: Number of columns spanned
+//  - $number-of-columns: Total number of columns in the grid
+//  - $type: Defaults to a fluid percentage based size else returns em size
+//  - $container-width: defaults to 100 for fluid - pass a em width for a fixed width grid
+// ----------------------------------------------------
+
+@function calculate-column-width($column-span, $number-of-columns, $type: "fluid", $container-width:100){
+	
+	@if $type == "fluid"{
+		@return (($column-span/$number-of-columns)*$container-width)#{"%"};
+	}@else{
+		$single-calculate-column-width: $container-width/$number-of-columns;
+		$calculate-column-width: (($single-calculate-column-width * $column-span) - $grid-gutter-width);
+		@return $calculate-column-width;		
+	}
+}
+
+// ----------------------------------------------------
+//	MAKE-COLUMNS
+//  - $number-of-columns: Total number of columns in the grid
+//  - $prefix: Prefix for grid size
+//  - $grid-style: Defaults to a fluid percentage based size else creates fixed width columns
+//  - generates class names like .col-sm-8
+// ----------------------------------------------------
+
+@mixin make-columns($number-of-columns, $prefix, $grid-style:"fluid"){
+
+	// Check if a prefix has been set 
+	// Create size-prefix to add to class names
+	$size-prefix: "-";
+	@if $prefix != ""{
+		$size-prefix: "-"#{$prefix}"-";	
+	}
+	
+	// Loop and create columns
+	@for $i from 1 through $number-of-columns{	
+		
+		@if $grid-style == "fluid"{
+			.col#{$size-prefix}#{$i}{
+				width: calculate-column-width($i,$number-of-columns,"fluid",100);
+			}
+		}@else{
+			.col#{$size-prefix}#{$i}{
+				float: left;
+				width: calculate-column-width($i,$number-of-columns,"fixed",$grid-fixed-width);
+				padding-left: $grid-gutter-width/2;
+				padding-right: $grid-gutter-width/2;
+			}
+		}
+	}
+	
+	// Create Pre Offsets
+	@for $i from 1 through $number-of-columns{
+		@if $grid-style == "fluid"{
+			.col#{$size-prefix}pre-#{$i}{
+				margin-left: calculate-column-width($i,$number-of-columns,"fluid",100);				
+			}
+		}@else{
+			.col#{$size-prefix}pre-#{$i}{		
+				margin-left: calculate-column-width($i,$number-of-columns,"fixed",$grid-fixed-width);							
+			}
+		}		
+	}
+	
+	// Create Post Offsets
+	@for $i from 1 through $number-of-columns{
+		@if $grid-style == "fluid"{
+			.col#{$size-prefix}post-#{$i}{
+				margin-right: calculate-column-width($i,$number-of-columns,"fluid",100);				
+			}
+		}@else{
+			.col#{$size-prefix}post-#{$i}{		
+				margin-right: calculate-column-width($i,$number-of-columns,"fixed",$grid-fixed-width);							
+			}
+		}		
+	}
+		
+	.col#{$size-prefix}reverse{
+		float: right;
+	}
+
+
+	.col#{$size-prefix}reset{
+		margin-left: 0;
+		margin-right: 0;
+		float: left;
+	}	
+
+}
+
+@mixin make-column-reverse($size){
+	@if $size != ""{
+		.row{
+			> .col-#{$size}-reverse{
+				float: right;
+			}
+
+			> .col-#{$size}-reset-reverse{
+				float: left;
+			}
+		}
+	}
+	@if $size == ""{
+		.row{
+			> .col-reverse{
+				float: right;
+			}
+
+			> .col-reset-reverse{
+				float: left;
+			}			
+		}
+	}
+}
+
+
+@mixin make-golden-columns($number-of-columns, $size){
+	$ratio: 1.618;
+	$column-base: 100;
+	$previous: $column-base;
+
+	$size-prefix: "-";
+	
+	@if $size != ""{
+		$size-prefix: "-"#{$size}"-";	
+	}
+	
+	@for $i from 1 through $number-of-columns{
+	
+		.col#{$size-prefix}golden-#{$i}{
+	
+				width: ($previous / $ratio)#{"%"};
+				$previous: $previous / $ratio;
+		}
+	
+	}
+}
+
+
